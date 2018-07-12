@@ -1,0 +1,57 @@
+/*--------------------------------------------------------------
+Bastian's Styling
+--------------------------------------------------------------*/
+table.DataTable {
+  margin: 50px 50px;
+}
+
+.dropout-table td, .dataTables_filter {
+  font-family: 'Arial', sans-serif;
+  font-size: 1.0em;
+  color: #151b27;
+}
+
+label.text {
+  display: none;
+}
+
+input {
+  border: 1px solid #151b27;
+  padding: 0.25em 0.25em;
+  background-image: url("search.svg");
+  background-repeat: no-repeat;
+  background-position: center left 5px;
+}
+
+input:focus {
+  background: none;
+}
+
+table.dataTable thead .sorting_asc {
+    font-weight: bold;
+}
+
+table.dataTable thead .sorting_desc {
+    font-weight: bold;
+}
+
+table.dataTable thead {
+    font-size: 0.92em;
+}
+
+table.dataTable.order-column tbody tr > .sorting_1,
+table.dataTable.order-column tbody tr > .sorting_2,
+table.dataTable.order-column tbody tr > .sorting_3, table.dataTable.display tbody tr > .sorting_1,
+table.dataTable.display tbody tr > .sorting_2,
+table.dataTable.display tbody tr > .sorting_3 {
+  font-weight: bold;
+}
+
+table.dataTable tbody th, table.dataTable tbody td {
+    padding: 0.8em 1em;
+}
+
+table.dataTable thead th, table.dataTable thead td {
+    padding: 0.4em 1em;
+    border-bottom: 1px solid #0a2147;
+}

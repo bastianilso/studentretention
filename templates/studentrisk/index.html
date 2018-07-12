@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang = "en">
+<head>
+<meta charset = "urf-8" name = "viewport" content = "width=device-width, initial-scale=1"/>
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'studentrisk/DataTables-1.10.18/css/jquery.dataTables.css' %}"/>
+<link rel="stylesheet" type="text/css" href="{% static 'studentrisk/FixedHeader-3.1.4/css/fixedHeader.dataTables.min.css' %}"/>
+<link rel="stylesheet" type="text/css" href="{% static 'studentrisk/style.css' %}" />
+<title>Student Retention</title>
+</head>
+<body>
+<div>
+  <img src="{% static 'studentrisk/logo.svg' %}" alt="AAU Student Analytics"/>
+</div>
+{% if student_list %}
+  <table id="mytable" class="dropout-table order-column" >
+      <thead>
+        <tr id="table-header">
+          <td>NAME</td>
+          <td>COHORT</td>
+          <td>SEMESTER</td>
+          <td>CAMPUS</td>
+          <td>WORK HOURS</td>
+          <td>GROWTH</td>
+          <td>MATH SKILL</td>
+          <td>RISK</td>
+        </tr>
+      </thead>
+    <tbody>
+    {% for student in student_list %}
+      <tr style="background: {{ student.get_bgcolor }};">
+        <td>{{ student.full_name }}</td>
+        <td>{{ student.cohort.year }}</td>
+        <td>{{ student.current_semester }}th</td>
+        <td>{{ student.campus }}</td>
+        <td>{{ student.work_hours }}</td>
+        <td>{{ student.growth_mindset }}</td>
+        <td>{{ student.mathemathical_skill }}</td>
+        <td>{{ student.dropout_risk }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No students are available</p>
+{% endif %}
+</body>
+<script type="text/javascript" src="{% static 'studentrisk/jQuery-3.3.1/jquery-3.3.1.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'studentrisk/DataTables-1.10.18/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'studentrisk/FixedHeader-3.1.4/js/dataTables.fixedHeader.min.js' %}"></script>
+
+<script type = "text/javascript">
+$(document).ready(function() {
+    $('#mytable').DataTable( {
+        "autoWidth": true,
+        "fixedHeader": true,
+        "paging":   false,
+        "info":     false,
+    } );
+} );
+</script>
+</html>

@@ -2,41 +2,76 @@
 <html lang = "en">
 <head>
 <meta charset = "urf-8" name = "viewport" content = "width=device-width, initial-scale=1"/>
+<link rel="shortcut icon" href="https://www.moodle.aau.dk/theme/image.php/aalborg/theme/1528108766/favicon" />
 {% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'studentrisk/DataTables-1.10.18/css/jquery.dataTables.css' %}"/>
-<link rel="stylesheet" type="text/css" href="{% static 'studentrisk/FixedHeader-3.1.4/css/fixedHeader.dataTables.min.css' %}"/>
+<link rel="stylesheet" type="text/css" href="{% static 'studentrisk/jquery-ui-1.12.1/jquery-ui.min.css' %}"/>
+<link rel="stylesheet" type="text/css" href="{% static 'studentrisk/datatables.min.css' %}"/>
 <link rel="stylesheet" type="text/css" href="{% static 'studentrisk/style.css' %}" />
 <title>Student Retention</title>
 </head>
 <body>
-<div>
-  <img src="{% static 'studentrisk/logo.svg' %}" alt="AAU Student Analytics"/>
-</div>
+<div class="table-branding">
 {% if student_list %}
+  <div class="head-navigation" id="head-navigation">
+  <img src="{% static 'studentrisk/logo.svg' %}" alt="AAU Student Analytics" id="AnalyticsLogo" class="head-control"/>
+  <form action="" method="post">
+    {% csrf_token %}
+    <select id="dataset" class="head-control" name="dataset">
+    {% for cohort in cohort_list %}
+      {% for sem in semester_list %}
+        <option value="{{cur_study}},{{cohort.startaar}},{{sem.modelsemester}}" {% if sem.modelsemester|floatformat == cur_sem|floatformat %}selected="selected"{% endif %}>{{ cur_study }} Cohort {{ cohort.startaar }} Semester {{ sem.modelsemester }}</option>
+      {% endfor %}
+    {% endfor %}
+  </select>
+
+</form>
+  <input id="aauSearchField"  placeholder="Search.." aria-controls="mytable" type="search">
+  <ul class="table-aggregates head-control" id="aggregate-info">
+    <li><span class="counter">{{ student_count }}</span><br /> students</li>
+    <li><span class="counter">{{ students_at_risk }}</span><br /> at risk</li>
+    <li><span class="counter">{{ dropout_count }}</span><br /> dropouts</li>
+    <li>Last update:<br />{{ last_update|date:"d-m-Y" }}</li>
+  </ul>
+  </div>
   <table id="mytable" class="dropout-table order-column" >
       <thead>
         <tr id="table-header">
-          <td>NAME</td>
-          <td>COHORT</td>
-          <td>SEMESTER</td>
-          <td>CAMPUS</td>
-          <td>WORK HOURS</td>
-          <td>GROWTH</td>
-          <td>MATH SKILL</td>
-          <td>RISK</td>
+          <th></th>
+          <th>E-mail</th>
+          <th>Indskrivelsesperiode</th>
+          <th>Adgangsgrundlag</th>
+          <th>Status</th>
+          <th id="studie  nr" title="">name</th>
+          <th id="name" title="">study no.</th>
+          <th id="name" title="">campus</th>
+          {% for predictor in predictor_list %}
+            <th id="{{ predictor.nameshort }}" title="">{{ predictor.name }}</th>
+          {% endfor %}
+          <th id="risk" title="">risk</th>
         </tr>
       </thead>
     <tbody>
     {% for student in student_list %}
-      <tr style="background: {{ student.get_bgcolor }};">
-        <td>{{ student.full_name }}</td>
-        <td>{{ student.cohort.year }}</td>
-        <td>{{ student.current_semester }}th</td>
-        <td>{{ student.campus }}</td>
-        <td>{{ student.work_hours }}</td>
-        <td>{{ student.growth_mindset }}</td>
-        <td>{{ student.mathemathical_skill }}</td>
-        <td>{{ student.dropout_risk }}</td>
+      <tr class="studentRow" style="background: {{ student.get_bgcolor }};">
+        <td></td>
+        <td>{{ student.email }}</td>
+        <td>{{ student.fra_dato }} - {{ student.til_dato }}</td>
+        <td>{{ student.adgangsgrundlag }}</td>
+        <td>{% if student.udmeld_aarsag %} Dropout - {{ student.udmeld_begrundelse }} {% else %} Active {% endif %}</td>
+        <td>{{ student.fullname }}</td>
+        <td>{{ student.studienr }}</td>
+        <td>{{ student.campusname }}</td>
+        {% if cur_sem|floatformat == '0' %}
+          <td>{{ student.matgrade|default_if_none:"" }}</td>
+        {% elif cur_sem|floatformat == '1' %}
+          <td>{{ student.x1_t_atnby|floatformat:"-2"|default_if_none:"" }}</td>
+          <td>{{ student.x1_nt_mgpa|floatformat:"-2"|default_if_none:"" }}</td>
+          <td>{{ student.x1_pr_mgpa|floatformat:"-2"|default_if_none:""}}</td>
+        {% elif cur_sem|floatformat == '2' %}
+          <td>{{ student.x2_t_atnby|floatformat:"-2"|default_if_none:"" }}</td>
+          <td>{{ student.x2_pr_mgpa|floatformat:"-2"|default_if_none:"" }}</td>
+        {% endif %}
+        <td>{% if student.udmeld_aarsag %} Dropout {% else %} {{ student.risk|floatformat:"-2"|default_if_none:"" }} {% endif %}</td>
       </tr>
     {% endfor %}
     </tbody>
@@ -44,19 +79,134 @@
 {% else %}
   <p>No students are available</p>
 {% endif %}
+</div>
 </body>
-<script type="text/javascript" src="{% static 'studentrisk/jQuery-3.3.1/jquery-3.3.1.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'studentrisk/DataTables-1.10.18/js/jquery.dataTables.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'studentrisk/FixedHeader-3.1.4/js/dataTables.fixedHeader.min.js' %}"></script>
-
+<footer>
+  <p>AALBORG UNIVERSITY STUDENT ANALYTICS BY BASTIAN ILSØ HOUGAARD, BIANCA CLAVIO CHRISTENSEN,
+    HENDRIK KNOCHE AND NINNA VIHRS. BASED ON MIT-LICENSED DJANGO WEB FRAMEWORK AND DATATABLES.NET.</p>
+</footer>
+<script type="text/javascript" src="{% static 'studentrisk/datatables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'studentrisk/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
 <script type = "text/javascript">
+$(function() {
+  {%  for predictor in predictor_list %}
+    $("#{{ predictor.nameshort }}").tooltip({
+    content: "<strong>Risk Predictor</strong><br />"+
+             "{{ predictor.explanation }} <br />"+
+             "Origin: {{ predictor.source }}<br />"+
+             "<em>p-value &#61; {{ predictor.pvalue|default_if_none:"Unknown" }}<br />"+
+             "exp. coef. &#61; {{ predictor.exp_coef_field|default_if_none:"Unknown" }}<br /></em>",
+    track: true
+  });
+  {% endfor %}
+
+  $("#risk").tooltip({
+  content: "<strong>Dropout Risk</strong><br />The predicted risk that the student drops out.",
+  track: true
+  });
+
+  $("#dataset").selectmenu({
+    change: function( event, ui ) {
+      event.preventDefault();
+      this.form.submit();
+    }
+  });
+
+});
+
+/* Formatting function for row details - modify as you need */
+function format ( d ) {
+    // `d` is the original data object for the row
+    return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;" class="studentDetails">'+
+        '<tr>'+
+            '<td>E-mail:</td>'+
+            '<td><a href="mailto:'+d.email+'">'+d.email+'</a></td>'+
+        '</tr>'+
+        '<tr>'+
+            '<td>Enrolled:</td>'+
+            '<td>'+d.indskriv+'</td>'+
+        '</tr>'+
+        '<tr>'+
+            '<td>Access:</td>'+
+            '<td>'+d.adgang+'</td>'+
+        '</tr>'+
+        '<tr>'+
+            '<td>Status:</td>'+
+            '<td>'+d.udmeld+'</td>'+
+        '</tr>'+
+    '</table>';
+}
+
+
 $(document).ready(function() {
-    $('#mytable').DataTable( {
-        "autoWidth": true,
+    oTable = $('#mytable').DataTable( {
+        "autoWidth": false,
         "fixedHeader": true,
         "paging":   false,
         "info":     false,
+        "orderClasses": false,
+        "order": [[5, 'asc']],
+        buttons: [
+            'csv', 'pdf'
+        ],
+        "processing": true,
+        "columnDefs": [
+            {
+                "targets": [ 0 ],
+                "className":      'details-control',
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": ''
+            },
+            {
+                "targets": [ 1 ],
+                "visible": false,
+                "searchable": false,
+                "data": "email"
+            },
+            {
+                "targets": [ 2 ],
+                "visible": false,
+                "searchable": false,
+                "data": "indskriv"
+            },
+            {
+                "targets": [ 3 ],
+                "visible": false,
+                "searchable": false,
+                "data": "adgang"
+            },
+            {
+                "targets": [ 4 ],
+                "visible": false,
+                "searchable": false,
+                "data": "udmeld"
+            },
+        ],
+    });
+
+    oTable.buttons(0, null).containers().appendTo('#head-navigation');
+
+    // Add event listener for opening and closing details
+    $('#mytable tbody').on('click', 'tr.studentRow', function () {
+        var tr = $(this).closest('tr');
+        var row = oTable.row( tr );
+
+        if ( row.child.isShown() ) {
+            // This row is already open - close it
+            row.child.hide();
+            $(this).removeClass('shown');
+        }
+        else {
+            // Open this row
+            row.child( format(row.data()) ).show();
+            $(this).addClass('shown');
+        }
     } );
+
+  $('#aauSearchField').keyup(function(){
+      oTable.search($(this).val()).draw();
+  });
 } );
 </script>
 </html>

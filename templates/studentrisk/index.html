@@ -23,20 +23,22 @@
       {% endfor %}
     {% endfor %}
   </select>
-
 </form>
   <input id="aauSearchField"  placeholder="Search.." aria-controls="mytable" type="search">
   <ul class="table-aggregates head-control" id="aggregate-info">
     <li><span class="counter">{{ student_count }}</span><br /> students</li>
     <li><span class="counter">{{ students_at_risk }}</span><br /> at risk</li>
     <li><span class="counter">{{ dropout_count }}</span><br /> dropouts</li>
-    <li>Last update:<br />{{ last_update|date:"d-m-Y" }}</li>
+    <li>Last update:<br />{{ last_update|date:"d-M-Y"|default:"Unknown" }}</li>
   </ul>
   </div>
+  <div id="status" class="nochange"></div>
   <table id="mytable" class="dropout-table order-column" >
       <thead>
         <tr id="table-header">
+          <th><img src="{% static 'studentrisk/checkmark.svg' %}" alt="checkmark" id="checkmark"/></th>
           <th></th>
+          <th>Comment</th>
           <th>E-mail</th>
           <th>Indskrivelsesperiode</th>
           <th>Adgangsgrundlag</th>
@@ -44,34 +46,46 @@
           <th id="studie  nr" title="">name</th>
           <th id="name" title="">study no.</th>
           <th id="name" title="">campus</th>
+          <th id="risk" title=""><strong>risk</strong></th>
           {% for predictor in predictor_list %}
-            <th id="{{ predictor.nameshort }}" title="">{{ predictor.name }}</th>
+            <th id="{{ predictor.nameshort }}" title="">{{ predictor.nameshort }}</th>
           {% endfor %}
-          <th id="risk" title="">risk</th>
         </tr>
       </thead>
     <tbody>
     {% for student in student_list %}
       <tr class="studentRow" style="background: {{ student.get_bgcolor }};">
-        <td></td>
+        <td class="statuscol"><input type="checkbox" class="checkbox" studienr="{{ student.studienr }}" {% if student.checked %} checked {% endif %} autocomplete="off"></input></td>
+        <td class="{% if student.comment %}hascomment{% endif %} clickexpand statuscol"></td>
+        <td><textarea rows="6" cols="40" class="commentfield" studienr="{{ student.studienr }}" autocomplete="off">{{ student.comment }}</textarea></td>
         <td>{{ student.email }}</td>
         <td>{{ student.fra_dato }} - {{ student.til_dato }}</td>
-        <td>{{ student.adgangsgrundlag }}</td>
+        <td>{{ student.adgangsgrundlag|default:"Unknown" }}</td>
         <td>{% if student.udmeld_aarsag %} Dropout - {{ student.udmeld_begrundelse }} {% else %} Active {% endif %}</td>
-        <td>{{ student.fullname }}</td>
-        <td>{{ student.studienr }}</td>
-        <td>{{ student.campusname }}</td>
-        {% if cur_sem|floatformat == '0' %}
-          <td>{{ student.matgrade|default_if_none:"" }}</td>
-        {% elif cur_sem|floatformat == '1' %}
-          <td>{{ student.x1_t_atnby|floatformat:"-2"|default_if_none:"" }}</td>
-          <td>{{ student.x1_nt_mgpa|floatformat:"-2"|default_if_none:"" }}</td>
-          <td>{{ student.x1_pr_mgpa|floatformat:"-2"|default_if_none:""}}</td>
-        {% elif cur_sem|floatformat == '2' %}
-          <td>{{ student.x2_t_atnby|floatformat:"-2"|default_if_none:"" }}</td>
-          <td>{{ student.x2_pr_mgpa|floatformat:"-2"|default_if_none:"" }}</td>
-        {% endif %}
-        <td>{% if student.udmeld_aarsag %} Dropout {% else %} {{ student.risk|floatformat:"-2"|default_if_none:"" }} {% endif %}</td>
+        <td class="clickexpand" >{{ student.fullname }}</td>
+        <td class="clickexpand">{{ student.studienr }}</td>
+        <td class="clickexpand">{{ student.campusname }}</td>
+        <td class="clickexpand"><strong>{% if student.udmeld_aarsag %} Dropout {% else %} {{ student.risk|floatformat:"-2"|default:"Unknown" }} {% endif %}</strong></td>
+        {% if pred_count >= 1 %} <td class="clickexpand">{{ student.p1|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 2 %} <td class="clickexpand">{{ student.p2|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 3 %} <td class="clickexpand">{{ student.p3|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 4 %} <td class="clickexpand">{{ student.p4|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 5 %} <td class="clickexpand">{{ student.p5|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 6 %} <td class="clickexpand">{{ student.p6|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 7 %} <td class="clickexpand">{{ student.p7|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 8 %} <td class="clickexpand">{{ student.p8|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 9 %} <td class="clickexpand">{{ student.p9|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 10 %} <td class="clickexpand">{{ student.p10|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 11 %} <td class="clickexpand">{{ student.p11|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 12 %} <td class="clickexpand">{{ student.p12|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 13 %} <td class="clickexpand">{{ student.p13|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 14 %} <td class="clickexpand">{{ student.p14|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 15 %} <td class="clickexpand">{{ student.p15|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 16 %} <td class="clickexpand">{{ student.p16|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 17 %} <td class="clickexpand">{{ student.p17|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 18 %} <td class="clickexpand">{{ student.p18|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 19 %} <td class="clickexpand">{{ student.p19|default:"Empty" }}</td> {% endif %}
+        {% if pred_count >= 20 %} <td class="clickexpand">{{ student.p20|default:"Empty" }}</td> {% endif %}
       </tr>
     {% endfor %}
     </tbody>
@@ -92,10 +106,10 @@ $(function() {
   {%  for predictor in predictor_list %}
     $("#{{ predictor.nameshort }}").tooltip({
     content: "<strong>Risk Predictor</strong><br />"+
-             "{{ predictor.explanation }} <br />"+
-             "Origin: {{ predictor.source }}<br />"+
              "<em>p-value &#61; {{ predictor.pvalue|default_if_none:"Unknown" }}<br />"+
-             "exp. coef. &#61; {{ predictor.exp_coef_field|default_if_none:"Unknown" }}<br /></em>",
+             "exp. coef. &#61; {{ predictor.exp_coef_field|default_if_none:"Unknown" }}<br />"+
+             "Origin: {{ predictor.source|default:"Unknown" }}<br /></em>"+
+             "{{ predictor.explanation }} <br />",
     track: true
   });
   {% endfor %}
@@ -134,6 +148,10 @@ function format ( d ) {
             '<td>Status:</td>'+
             '<td>'+d.udmeld+'</td>'+
         '</tr>'+
+        '<tr>'+
+            '<td>Comment:</td>'+
+            '<td>'+d.comment+'</td>'+
+        '</tr>'+
     '</table>';
 }
 
@@ -147,37 +165,50 @@ $(document).ready(function() {
         "orderClasses": false,
         "order": [[5, 'asc']],
         buttons: [
-            'csv', 'pdf'
+            'csv',
+            {
+            extend: 'pdf',
+            orientation: 'landscape',
+            exportOptions: {
+              columns: ':visible'
+            }
+            }
         ],
         "processing": true,
         "columnDefs": [
             {
-                "targets": [ 0 ],
+                "targets": [ 1 ],
                 "className":      'details-control',
                 "orderable":      false,
                 "data":           null,
                 "defaultContent": ''
             },
             {
-                "targets": [ 1 ],
-                "visible": false,
-                "searchable": false,
-                "data": "email"
-            },
-            {
                 "targets": [ 2 ],
                 "visible": false,
                 "searchable": false,
-                "data": "indskriv"
+                "data": "comment"
             },
             {
                 "targets": [ 3 ],
                 "visible": false,
                 "searchable": false,
-                "data": "adgang"
+                "data": "email"
             },
             {
                 "targets": [ 4 ],
+                "visible": false,
+                "searchable": false,
+                "data": "indskriv"
+            },
+            {
+                "targets": [ 5 ],
+                "visible": false,
+                "searchable": false,
+                "data": "adgang"
+            },
+            {
+                "targets": [ 6 ],
                 "visible": false,
                 "searchable": false,
                 "data": "udmeld"
@@ -185,28 +216,72 @@ $(document).ready(function() {
         ],
     });
 
-    oTable.buttons(0, null).containers().appendTo('#head-navigation');
 
+
+    oTable.buttons(0, null).containers().appendTo('#head-navigation');
     // Add event listener for opening and closing details
-    $('#mytable tbody').on('click', 'tr.studentRow', function () {
+    $('#mytable tbody').on('click', 'td.clickexpand', function () {
         var tr = $(this).closest('tr');
         var row = oTable.row( tr );
 
         if ( row.child.isShown() ) {
             // This row is already open - close it
             row.child.hide();
-            $(this).removeClass('shown');
+            $(this).parent('tr').removeClass('shown');
         }
         else {
             // Open this row
             row.child( format(row.data()) ).show();
-            $(this).addClass('shown');
+            $(this).parent('tr').addClass('shown');
+
+            var timeoutId;
+            $('.commentfield').on('keyup', function() {
+              if ($(this).val()) {
+                tr.children('td').eq(1).addClass('hascomment');
+              } else {
+                tr.children('td').eq(1).removeClass('hascomment');
+              }
+              $('#status').text('saving changes..');
+              if (timeoutId) clearTimeout(timeoutId);
+              data = {
+                      'comment': $(this).val(),
+                      'studienr': $(this).attr("studienr")
+                    };
+              timeoutId = setTimeout(function () {
+                  $.ajax({
+                      url: '/ajax/update_comment',
+                      data: data
+                  });
+                  $('#status').text('');
+              }, 750);
+            });
         }
     } );
+
+  $('.checkbox').change(function () {
+    var state = $(this).is(':checked');
+    var studienr = $(this).attr("studienr");
+    $('#status').text('saving changes..');
+    $.ajax({
+      url: '/ajax/update_checkbox/',
+      data: {
+        'state': state,
+        'studienr': studienr
+      },
+      dataType: 'json',
+      success: function (data) {
+        if (data.success) {
+          $('#status').text('');
+        }
+      }
+    })
+  });
 
   $('#aauSearchField').keyup(function(){
       oTable.search($(this).val()).draw();
   });
+
 } );
+
 </script>
 </html>

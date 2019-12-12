@@ -1,5 +1,5 @@
-# Student Retention
-This is a user interface for student dropout prediction analytics written in Python using Django and DataTables.
+# Student Analytics
+This is a user interface for student analytics written in Python using Django and DataTables.
 
 The project uses the following DataTables extensions and JS components:
 *  static/studentrisk/Buttons-1.5.2/
